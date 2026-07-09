@@ -1,9 +1,14 @@
-import { Input } from "@base-ui/react";
 import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Circle, EllipsisVertical } from "lucide-react";
 import { Task } from "@/types/task";
 import { Checkbox } from "../ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const STATUS = {
   todo: { label: "준비 중", color: "fill-red-400" },
@@ -17,6 +22,7 @@ export default function TaskCard({
   status,
   dueDate,
 }: Task) {
+  const statusInfo = STATUS[status];
   return (
     <Card className="min-w-72 w-full p-4">
       <CardContent className="text-sm text-black flex items-center justify-between gap-2">
@@ -30,12 +36,15 @@ export default function TaskCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="flex items-center justify-between bg-transparent border-none hover:bg-muted focus:ring-0 focus:ring-offset-0 cursor-pointer w-20 gap-2">
+          <Button
+            variant="ghost"
+            className="justify-between cursor-pointer w-20 gap-2"
+          >
             {
               <>
-                <Circle className={`h-3 w-3 ${STATUS[status].color}`} />
+                <Circle className={`h-3 w-3 ${statusInfo.color}`} />
                 <span className="flex-1 text-center text-xs text-black">
-                  {STATUS[status].label}
+                  {statusInfo.label}
                 </span>
               </>
             }
@@ -43,7 +52,16 @@ export default function TaskCard({
           <p className="text-sm text-muted-foreground text-center w-10">
             D-{dueDate}
           </p>
-          <EllipsisVertical className="cursor-pointer" />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <EllipsisVertical className="cursor-pointer" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>수정</DropdownMenuItem>
+              <DropdownMenuItem>상태 변경</DropdownMenuItem>
+              <DropdownMenuItem>삭제</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardContent>
     </Card>
