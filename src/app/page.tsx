@@ -11,35 +11,68 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { tasks } from "@/data/tasks";
+import { StatusFilter, TaskSortOrder } from "@/types/task";
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 
-const items = [
-  { value: "전체", label: "전체" },
-  { value: "준비 중", label: "준비 중" },
-  { value: "진행 중", label: "진행 중" },
-  { value: "완료", label: "완료" },
+const selectStatusItems: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "전체" },
+  { value: "todo", label: "준비 중" },
+  { value: "progress", label: "진행 중" },
+  { value: "done", label: "완료" },
+];
+
+const selectSortItems: { value: TaskSortOrder; label: string }[] = [
+  { value: "desc", label: "최신 순" },
+  { value: "asc", label: "오래된 순" },
 ];
 
 export default function Home() {
   const [taskList] = useState(tasks);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortOrder, setSortOrder] = useState<TaskSortOrder>("asc");
+  const keyword = searchQuery.toLowerCase();
+
+  const currentStatusLabel =
+    selectStatusItems.find((item) => item.value === statusFilter)?.label ??
+    "전체";
 
   const filteredTasks = taskList.filter((task) => {
-    const keyword = searchQuery.toLowerCase();
+    const matchesStatus =
+      statusFilter === "all" || task.status === statusFilter;
 
-    return (
+    const matchesSearchQuery =
       task.title.toLowerCase().includes(keyword) ||
-      task.description.toLowerCase().includes(keyword)
-    );
+      task.description.toLowerCase().includes(keyword);
+
+    return matchesStatus && matchesSearchQuery;
   });
+
+  const currentSortLabel = selectSortItems.find(
+    (item) => item.value === sortOrder,
+  )?.label;
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    return sortOrder === "asc" ? a.dueDate - b.dueDate : b.dueDate - a.dueDate;
+  });
+
+  const stats = taskList.reduce(
+    (acc, task) => {
+      if (task.status === "progress") acc.inProgress++;
+      if (task.status === "done") acc.completed++;
+      return acc;
+    },
+    { inProgress: 0, completed: 0 },
+  );
 
   return (
     <div className="flex h-full flex-col p-8 gap-6">
       <h2 className="text-3xl font-bold">My Tasks</h2>
       <div className="text-lg text-muted-foreground">
-        <span>12 tasks</span> | <span>8 In progress</span> |{" "}
-        <span>4 Completed</span>
+        <span>{taskList.length} tasks</span> |{" "}
+        <span>{stats.inProgress} In progress</span> |{" "}
+        <span>{stats.completed} Completed</span>
       </div>
       <div className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -49,25 +82,46 @@ export default function Home() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Select>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              if (value) {
+                setStatusFilter(value);
+              }
+            }}
+          >
             <SelectTrigger>
-              <SelectValue className="w-16" placeholder="전체" />
+              <SelectValue className="w-16" placeholder="전체">
+                {currentStatusLabel}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
-              {items.map((item) => (
+              {selectStatusItems.map((item) => (
                 <SelectItem key={item.value} value={item.value}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select>
+          <Select
+            value={sortOrder}
+            onValueChange={(value) => {
+              if (value) {
+                setSortOrder(value);
+              }
+            }}
+          >
             <SelectTrigger>
-              <SelectValue className="w-16" placeholder="정렬" />
+              <SelectValue className="w-16" placeholder="정렬">
+                {currentSortLabel}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
-              <SelectItem value="최신 순">최신 순</SelectItem>
-              <SelectItem value="오래된 순">오래된 순</SelectItem>
+              {selectSortItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -80,7 +134,7 @@ export default function Home() {
           New Task
         </Button>
       </div>
-      <TaskList tasks={filteredTasks} />
+      <TaskList tasks={sortedTasks} />
     </div>
   );
 }
