@@ -10,3 +10,10 @@ export interface Task {
   status: TaskStatus;
   dueDate: number;
 }
+
+export interface TaskForm {
+  title: string;
+  description: string;
+  status: TaskStatus;
+  dueDate: string;
+}

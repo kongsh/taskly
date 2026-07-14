@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { tasks } from "@/data/tasks";
-import { StatusFilter, TaskSortOrder } from "@/types/task";
+import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 
@@ -40,11 +40,21 @@ const selectSortItems: { value: TaskSortOrder; label: string }[] = [
   { value: "asc", label: "오래된 순" },
 ];
 
+const INITIAL_FORM: TaskForm = {
+  title: "",
+  description: "",
+  status: "todo",
+  dueDate: "",
+};
+
 export default function Home() {
-  const [taskList] = useState(tasks);
+  const [taskList, setTaskList] = useState<Task[]>(tasks);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortOrder, setSortOrder] = useState<TaskSortOrder>("asc");
+  const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const keyword = searchQuery.toLowerCase();
 
   const currentStatusLabel =
@@ -78,6 +88,37 @@ export default function Home() {
     },
     { inProgress: 0, completed: 0 },
   );
+
+  const updateForm = <K extends keyof TaskForm>(key: K, value: TaskForm[K]) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setDialogOpen(nextOpen);
+
+    if (!nextOpen) {
+      setForm(INITIAL_FORM);
+    }
+  };
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!form.title.trim()) return;
+    if (form.dueDate === "") return;
+    if (Number(form.dueDate) < 0) return;
+
+    setTaskList((prev) => [
+      ...prev,
+      { ...form, dueDate: Number(form.dueDate) },
+    ]);
+
+    setDialogOpen(false);
+    setForm(INITIAL_FORM);
+  };
 
   return (
     <div className="flex h-full flex-col p-8 gap-6">
@@ -139,7 +180,7 @@ export default function Home() {
           </Select>
         </div>
 
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger
             type="button"
             className="flex items-center gap-2 border p-1.5 rounded-lg h-8 text-base hover:bg-muted"
@@ -148,7 +189,7 @@ export default function Home() {
             New Task
           </DialogTrigger>
           <DialogContent>
-            <form>
+            <form onSubmit={handleSubmit}>
               <DialogHeader>
                 <DialogTitle>Create New Task</DialogTitle>
                 <DialogDescription>새 Task를 작성해보세요.</DialogDescription>
@@ -156,7 +197,13 @@ export default function Home() {
               <FieldGroup>
                 <Field>
                   <Label htmlFor="title">Task 제목</Label>
-                  <Input id="title" name="title" placeholder="Task 제목" />
+                  <Input
+                    id="title"
+                    name="title"
+                    placeholder="Task 제목"
+                    value={form.title}
+                    onChange={(e) => updateForm("title", e.target.value)}
+                  />
                 </Field>
                 <Field>
                   <Label htmlFor="description">설명</Label>
@@ -164,11 +211,22 @@ export default function Home() {
                     id="description"
                     name="description"
                     placeholder="Task 설명란"
+                    value={form.description}
+                    onChange={(e) => updateForm("description", e.target.value)}
                   />
                 </Field>
                 <Field>
                   <Label htmlFor="status">현재 상태</Label>
-                  <Select id="status" name="status">
+                  <Select
+                    id="status"
+                    name="status"
+                    value={form.status}
+                    onValueChange={(value) => {
+                      if (value) {
+                        updateForm("status", value);
+                      }
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="준비 중" />
                     </SelectTrigger>
@@ -185,22 +243,28 @@ export default function Home() {
                 </Field>
                 <Field>
                   <Label htmlFor="dueDate">마감 기한(D-day)</Label>
-                  <Input type="number" id="dueDate" name="dueDate" />
+                  <Input
+                    type="number"
+                    min={0}
+                    id="dueDate"
+                    name="dueDate"
+                    value={form.dueDate}
+                    onChange={(e) => updateForm("dueDate", e.target.value)}
+                  />
                 </Field>
               </FieldGroup>
               <DialogFooter>
                 <Button type="submit" variant="outline">
                   Add Task
                 </Button>
-                <DialogClose>
-                  <Button type="button" variant="destructive">
-                    Cancel
-                  </Button>
+                <DialogClose className="inline-flex items-center justify-center rounded-md bg-destructive/70 px-4 py-1 text-sm font-medium text-destructive-foreground hover:bg-destructive/80 transition-colors cursor-pointer">
+                  Cancel
                 </DialogClose>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
+        <pre>{JSON.stringify(form, null, 2)}</pre>
       </div>
       <TaskList tasks={sortedTasks} />
     </div>
