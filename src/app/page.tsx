@@ -41,6 +41,7 @@ const selectSortItems: { value: TaskSortOrder; label: string }[] = [
 ];
 
 const INITIAL_FORM: TaskForm = {
+  id: "",
   title: "",
   description: "",
   status: "todo",
@@ -113,11 +114,25 @@ export default function Home() {
 
     setTaskList((prev) => [
       ...prev,
-      { ...form, dueDate: Number(form.dueDate) },
+      {
+        ...form,
+        id: String(taskList.length + 1),
+        dueDate: Number(form.dueDate),
+      },
     ]);
 
     setDialogOpen(false);
     setForm(INITIAL_FORM);
+  };
+
+  const updateTask = (updatedTask: Task) => {
+    setTaskList((prev) =>
+      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+    );
+  };
+
+  const deleteTask = (deleteTaskId: string) => {
+    setTaskList((prev) => prev.filter((task) => task.id !== deleteTaskId));
   };
 
   return (
@@ -264,9 +279,12 @@ export default function Home() {
             </form>
           </DialogContent>
         </Dialog>
-        <pre>{JSON.stringify(form, null, 2)}</pre>
       </div>
-      <TaskList tasks={sortedTasks} />
+      <TaskList
+        tasks={sortedTasks}
+        updateTask={updateTask}
+        deleteTask={deleteTask}
+      />
     </div>
   );
 }

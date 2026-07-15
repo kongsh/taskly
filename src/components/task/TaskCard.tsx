@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Circle, EllipsisVertical } from "lucide-react";
-import { Task } from "@/types/task";
+import { Task, TaskForm } from "@/types/task";
 import { Checkbox } from "../ui/checkbox";
 import {
   DropdownMenu,
@@ -10,6 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+type TaskCardProps = {
+  task: Task;
+  handleUpdateClick: (nextOpen: boolean, task: TaskForm) => void;
+  handleDeleteClick: (nextOpen: boolean, id: string, title: string) => void;
+};
+
 const STATUS = {
   todo: { label: "준비 중", color: "fill-red-400" },
   progress: { label: "진행 중", color: "fill-yellow-300" },
@@ -17,12 +23,14 @@ const STATUS = {
 };
 
 export default function TaskCard({
-  title,
-  description,
-  status,
-  dueDate,
-}: Task) {
+  task,
+  handleUpdateClick,
+  handleDeleteClick,
+}: TaskCardProps) {
+  const { id, title, description, status, dueDate } = task;
+
   const statusInfo = STATUS[status];
+
   return (
     <Card className="min-w-72 w-full p-4">
       <CardContent className="text-sm text-black flex items-center justify-between gap-2">
@@ -57,9 +65,21 @@ export default function TaskCard({
               <EllipsisVertical className="cursor-pointer" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>수정</DropdownMenuItem>
-              <DropdownMenuItem>상태 변경</DropdownMenuItem>
-              <DropdownMenuItem>삭제</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  handleUpdateClick(true, {
+                    ...task,
+                    dueDate: String(dueDate),
+                  })
+                }
+              >
+                수정
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleDeleteClick(true, id, title)}
+              >
+                삭제
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
