@@ -1,5 +1,3 @@
-"use client";
-
 import { StatusFilter, Task, TaskForm } from "@/types/task";
 import TaskCard from "./TaskCard";
 import {
@@ -100,6 +98,19 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
     setDeleteDialogOpen(false);
   };
 
+  const handleStatusClick = (clickedTask: Task) => {
+    switch (clickedTask.status) {
+      case "todo":
+        updateTask({ ...clickedTask, status: "progress" });
+        break;
+      case "progress":
+        updateTask({ ...clickedTask, status: "done" });
+        break;
+      case "done":
+        break;
+    }
+  };
+
   return (
     <>
       <ul className="flex flex-col gap-4">
@@ -109,6 +120,7 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
               task={task}
               handleUpdateClick={handleUpdateClick}
               handleDeleteClick={handleDeleteClick}
+              handleStatusClick={handleStatusClick}
             />
           </li>
         ))}

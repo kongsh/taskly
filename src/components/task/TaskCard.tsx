@@ -2,7 +2,6 @@ import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Circle, EllipsisVertical } from "lucide-react";
 import { Task, TaskForm } from "@/types/task";
-import { Checkbox } from "../ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +13,7 @@ type TaskCardProps = {
   task: Task;
   handleUpdateClick: (nextOpen: boolean, task: TaskForm) => void;
   handleDeleteClick: (nextOpen: boolean, id: string, title: string) => void;
+  handleStatusClick: (updatedTask: Task) => void;
 };
 
 const STATUS = {
@@ -26,6 +26,7 @@ export default function TaskCard({
   task,
   handleUpdateClick,
   handleDeleteClick,
+  handleStatusClick,
 }: TaskCardProps) {
   const { id, title, description, status, dueDate } = task;
 
@@ -35,18 +36,10 @@ export default function TaskCard({
     <Card className="min-w-72 w-full p-4">
       <CardContent className="text-sm text-black flex items-center justify-between gap-2">
         <div className="flex items-center gap-4">
-          <Checkbox className="cursor-pointer size-4" />
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-lg font-semibold ">{title}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              {description}
-            </CardDescription>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
+            variant="secondary"
             className="justify-between cursor-pointer w-20 gap-2"
+            onClick={() => handleStatusClick(task)}
           >
             {
               <>
@@ -57,6 +50,14 @@ export default function TaskCard({
               </>
             }
           </Button>
+          <div className="flex flex-col gap-1">
+            <CardTitle className="text-lg font-semibold ">{title}</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              {description}
+            </CardDescription>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
           <p className="text-sm text-muted-foreground text-center w-10">
             D-{dueDate}
           </p>
