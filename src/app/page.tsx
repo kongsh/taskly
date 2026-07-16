@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { tasks } from "@/data/tasks";
 import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
 import { CirclePlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
@@ -56,6 +56,19 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState<TaskSortOrder>("asc");
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("TASK_LIST");
+
+    if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTaskList(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("TASK_LIST", JSON.stringify(taskList));
+  }, [taskList]);
 
   const keyword = searchQuery.toLowerCase();
 
