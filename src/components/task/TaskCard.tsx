@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 type TaskCardProps = {
   task: Task;
@@ -33,8 +34,13 @@ export default function TaskCard({
   const statusInfo = STATUS[status];
 
   return (
-    <Card className="min-w-72 w-full p-4">
-      <CardContent className="text-sm text-black flex items-center justify-between gap-2">
+    <Card
+      className={cn(
+        "min-w-72 w-full p-4 text-black",
+        status === "done" && "bg-muted text-gray-500",
+      )}
+    >
+      <CardContent className="text-sm  flex items-center justify-between gap-2">
         <div className="flex items-center gap-4">
           <Button
             variant="secondary"
