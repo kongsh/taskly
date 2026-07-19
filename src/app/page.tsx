@@ -161,69 +161,71 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-full flex-col p-8 gap-6">
+    <div className="min-w-96 flex size-full flex-col p-8 gap-6">
       <h2 className="text-3xl font-bold">My Tasks</h2>
-      <div className="text-lg text-muted-foreground">
+      <div className="text-lg text-muted-foreground text-nowrap">
         <span>{taskList.length} tasks</span> |{" "}
         <span>{stats.inProgress} In progress</span> |{" "}
         <span>{stats.completed} Completed</span>
       </div>
-      <div className="flex w-full items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex w-full items-center justify-between gap-4 flex-col-reverse md:flex-row">
+        <div className="flex items-center gap-4 w-full flex-col md:flex-row">
           <Input
-            className="max-w-64"
+            className="w-full md:max-w-64"
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Select
-            value={statusFilter}
-            onValueChange={(value) => {
-              if (value) {
-                setStatusFilter(value);
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue className="w-16" placeholder="전체">
-                {currentStatusLabel}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false}>
-              {selectStatusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={sortOrder}
-            onValueChange={(value) => {
-              if (value) {
-                setSortOrder(value);
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue className="w-16" placeholder="정렬">
-                {currentSortLabel}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false}>
-              {selectSortItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-4 w-full md:w-auto">
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => {
+                if (value) {
+                  setStatusFilter(value);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue className="w-16" placeholder="전체">
+                  {currentStatusLabel}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                {selectStatusItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={sortOrder}
+              onValueChange={(value) => {
+                if (value) {
+                  setSortOrder(value);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue className="w-16" placeholder="정렬">
+                  {currentSortLabel}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                {selectSortItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger
             type="button"
-            className="flex items-center gap-2 border p-1.5 rounded-lg h-8 text-base hover:bg-muted"
+            className="flex items-center gap-2 border p-1.5 rounded-lg h-8 text-base text-center w-full justify-center text-nowrap hover:bg-muted md:w-35"
           >
             <CirclePlus className="size-4" />
             New Task

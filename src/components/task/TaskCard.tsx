@@ -36,12 +36,12 @@ export default function TaskCard({
   return (
     <Card
       className={cn(
-        "min-w-72 w-full p-4 text-black",
+        "w-full p-4 text-black h-auto",
         status === "done" && "bg-muted text-gray-500",
       )}
     >
-      <CardContent className="text-sm  flex items-center justify-between gap-2">
-        <div className="flex items-center gap-4">
+      <CardContent className="text-sm gap-4 flex justify-between md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 flex-1 md:flex-row md:items-center">
           <Button
             variant="secondary"
             className="justify-between cursor-pointer w-20 gap-2"
@@ -56,40 +56,38 @@ export default function TaskCard({
               </>
             }
           </Button>
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-lg font-semibold ">{title}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
+          <div className="text-wrap">
+            <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground ">
               {description}
             </CardDescription>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <p className="text-sm text-muted-foreground text-center w-10">
+          <p className="text-sm text-muted-foreground md:flex-1 md:text-right">
             D-{dueDate}
           </p>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <EllipsisVertical className="cursor-pointer" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() =>
-                  handleUpdateClick(true, {
-                    ...task,
-                    dueDate: String(dueDate),
-                  })
-                }
-              >
-                수정
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDeleteClick(true, id, title)}
-              >
-                삭제
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="cursor-pointer rounded-md p-1 hover:bg-muted">
+            <EllipsisVertical />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() =>
+                handleUpdateClick(true, {
+                  ...task,
+                  dueDate: String(dueDate),
+                })
+              }
+            >
+              수정
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleDeleteClick(true, id, title)}
+            >
+              삭제
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardContent>
     </Card>
   );
