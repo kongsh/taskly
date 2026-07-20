@@ -6,7 +6,7 @@ import { MobileSidebar } from "./Sidebar";
 export default function Header() {
   return (
     <header className="h-16 border-b flex items-center">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
+      <div className="flex w-full items-center justify-between px-6">
         <Sheet>
           <SheetTrigger className="block md:hidden">
             <Menu className="h-6 w-6 hover:bg-muted rounded-sm" />

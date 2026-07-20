@@ -131,6 +131,10 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
     }
   };
 
+  const currentStatusLabel = selectStatusItems.find(
+    (item) => item.value === form.status,
+  )?.label;
+
   return (
     <>
       <ul className="flex flex-col gap-4">
@@ -194,7 +198,7 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="준비 중" />
+                    <SelectValue>{currentStatusLabel}</SelectValue>
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
                     {selectStatusItems.map((item) => (

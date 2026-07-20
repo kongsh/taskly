@@ -28,7 +28,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { tasks } from "@/data/tasks";
-import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
+import {
+  StatusFilter,
+  Task,
+  TaskForm,
+  TaskSortOrder,
+  TaskStatus,
+} from "@/types/task";
 import { CirclePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -52,6 +58,11 @@ const INITIAL_FORM: TaskForm = {
   status: "todo",
   dueDate: "",
 };
+
+const selectStatusFormItems: { value: TaskStatus; label: string }[] =
+  selectStatusItems.filter(
+    (item): item is { value: TaskStatus; label: string } => item.value !== "all"
+  );
 
 export default function Home() {
   const [taskList, setTaskList] = useState<Task[]>(tasks);
@@ -114,6 +125,10 @@ export default function Home() {
       [key]: value,
     }));
   };
+
+  const currentStatusFormLabel = selectStatusFormItems.find(
+    (item) => item.value === form.status,
+  )?.label;
 
   const handleOpenChange = (nextOpen: boolean) => {
     setDialogOpen(nextOpen);
@@ -290,7 +305,7 @@ export default function Home() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="준비 중" />
+                      <SelectValue>{currentStatusFormLabel}</SelectValue>
                     </SelectTrigger>
                     <SelectContent alignItemWithTrigger={false}>
                       {selectStatusItems
