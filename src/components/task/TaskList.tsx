@@ -9,8 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Field, FieldGroup } from "../ui/field";
-import { Label } from "../ui/label";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import {
@@ -77,12 +76,20 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
       toast.error("제목을 입력해주세요.");
       return;
     }
+    if (!form.description.trim()) {
+      toast.error("설명을 입력해주세요.");
+      return;
+    }
     if (form.dueDate === "") {
       toast.error("D-day를 입력해주세요.");
       return;
     }
-    if (Number(form.dueDate) < 0) {
-      toast.error("D-day는 0 이상의 값을 입력해주세요.");
+    if (Number(form.dueDate) < 1) {
+      toast.error("D-day는 1 이상의 값을 입력해주세요.");
+      return;
+    }
+    if (Number(form.dueDate) > 3650) {
+      toast.error("D-day는 3650 이하의 값을 입력해주세요.");
       return;
     }
 
@@ -147,27 +154,35 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
             </DialogHeader>
             <FieldGroup>
               <Field>
-                <Label htmlFor="title">Task 제목</Label>
+                <FieldLabel htmlFor="title">Task 제목</FieldLabel>
                 <Input
                   id="title"
                   name="title"
                   placeholder="Task 제목"
                   value={form.title}
                   onChange={(e) => updateForm("title", e.target.value)}
+                  maxLength={50}
                 />
+                <FieldDescription className="text-right">
+                  {form.title.length} / 50
+                </FieldDescription>
               </Field>
               <Field>
-                <Label htmlFor="description">설명</Label>
+                <FieldLabel htmlFor="description">설명</FieldLabel>
                 <Textarea
                   id="description"
                   name="description"
                   placeholder="Task 설명란"
                   value={form.description}
                   onChange={(e) => updateForm("description", e.target.value)}
+                  maxLength={300}
                 />
+                <FieldDescription className="text-right">
+                  {form.description.length} / 300
+                </FieldDescription>
               </Field>
               <Field>
-                <Label htmlFor="status">현재 상태</Label>
+                <FieldLabel htmlFor="status">현재 상태</FieldLabel>
                 <Select
                   id="status"
                   name="status"
@@ -191,10 +206,11 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
                 </Select>
               </Field>
               <Field>
-                <Label htmlFor="dueDate">마감 기한(D-day)</Label>
+                <FieldLabel htmlFor="dueDate">마감 기한(D-day)</FieldLabel>
                 <Input
                   type="number"
-                  min={0}
+                  min={1}
+                  max={3650}
                   id="dueDate"
                   name="dueDate"
                   value={form.dueDate}
