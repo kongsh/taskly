@@ -1,6 +1,6 @@
 "use client";
 
-import { TaskList } from "@/features/task/TaskList";
+import { TaskList } from "@/features/task/components/TaskList";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
