@@ -38,6 +38,7 @@ import {
 import { CirclePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { loadTasks, saveTasks } from "@/features/task/services/taskStorage";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -74,16 +75,12 @@ export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("TASK_LIST");
-
-    if (saved) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTaskList(JSON.parse(saved));
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTaskList(loadTasks(tasks));
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("TASK_LIST", JSON.stringify(taskList));
+    saveTasks(taskList);
   }, [taskList]);
 
   const keyword = searchQuery.toLowerCase();
