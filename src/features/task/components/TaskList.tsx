@@ -1,30 +1,5 @@
-import { StatusFilter, Task, TaskForm } from "@/types/task";
+import { Task, TaskForm } from "@/types/task";
 import TaskCard from "./TaskCard";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -40,18 +15,13 @@ import {
 import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { validateTaskForm } from "../utils/validateTaskForm";
+import { TaskFormDialog } from "./TaskFormDialog";
 
 type TaskListProps = {
   tasks: Task[];
   updateTask: (updatedTask: Task) => void;
   deleteTask: (deleteTaskId: string) => void;
 };
-
-const selectStatusItems: { value: StatusFilter; label: string }[] = [
-  { value: "todo", label: "준비 중" },
-  { value: "progress", label: "진행 중" },
-  { value: "done", label: "완료" },
-];
 
 const INITIAL_FORM: TaskForm = {
   id: "",
@@ -122,10 +92,6 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
     }
   };
 
-  const currentStatusLabel = selectStatusItems.find(
-    (item) => item.value === form.status,
-  )?.label;
-
   return (
     <>
       <ul className="flex flex-col gap-4">
@@ -140,90 +106,16 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
           </li>
         ))}
       </ul>
-      <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
-        <DialogContent>
-          <form onSubmit={handleUpdateSubmit}>
-            <DialogHeader>
-              <DialogTitle>Update Task</DialogTitle>
-              <DialogDescription>Task를 수정하세요.</DialogDescription>
-            </DialogHeader>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="title">Task 제목</FieldLabel>
-                <Input
-                  id="title"
-                  name="title"
-                  placeholder="Task 제목"
-                  value={form.title}
-                  onChange={(e) => updateForm("title", e.target.value)}
-                  maxLength={50}
-                />
-                <FieldDescription className="text-right">
-                  {form.title.length} / 50
-                </FieldDescription>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="description">설명</FieldLabel>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Task 설명란"
-                  value={form.description}
-                  onChange={(e) => updateForm("description", e.target.value)}
-                  maxLength={300}
-                />
-                <FieldDescription className="text-right">
-                  {form.description.length} / 300
-                </FieldDescription>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="status">현재 상태</FieldLabel>
-                <Select
-                  id="status"
-                  name="status"
-                  value={form.status}
-                  onValueChange={(value) => {
-                    if (value) {
-                      updateForm("status", value);
-                    }
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue>{currentStatusLabel}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent alignItemWithTrigger={false}>
-                    {selectStatusItems.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="dueDate">마감 기한(D-day)</FieldLabel>
-                <Input
-                  type="number"
-                  min={1}
-                  max={3650}
-                  id="dueDate"
-                  name="dueDate"
-                  value={form.dueDate}
-                  onChange={(e) => updateForm("dueDate", e.target.value)}
-                />
-              </Field>
-            </FieldGroup>
-            <DialogFooter>
-              <Button type="submit" variant="outline">
-                Update Task
-              </Button>
-              <DialogClose className="inline-flex items-center justify-center rounded-md bg-destructive/70 px-4 py-1 text-sm font-medium text-destructive-foreground hover:bg-destructive/80 transition-colors cursor-pointer">
-                Cancel
-              </DialogClose>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <TaskFormDialog
+        open={updateDialogOpen}
+        onOpenChange={setUpdateDialogOpen}
+        form={form}
+        onSubmit={handleUpdateSubmit}
+        updateForm={updateForm}
+        title="Task 수정"
+        description="Task를 수정해보세요."
+        submitLabel="Task 수정"
+      />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader className="flex flex-col">

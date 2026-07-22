@@ -1,23 +1,6 @@
 "use client";
 
 import { TaskList } from "@/features/task/components/TaskList";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -26,20 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { tasks } from "@/data/tasks";
-import {
-  StatusFilter,
-  Task,
-  TaskForm,
-  TaskSortOrder,
-  TaskStatus,
-} from "@/types/task";
-import { CirclePlus } from "lucide-react";
+import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { loadTasks, saveTasks } from "@/features/task/services/taskStorage";
 import { validateTaskForm } from "@/features/task/utils/validateTaskForm";
+import { TaskFormDialog } from "@/features/task/components/TaskFormDialog";
+import { DialogTrigger } from "@/components/ui/dialog";
+import { CirclePlus } from "lucide-react";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -61,19 +39,13 @@ const INITIAL_FORM: TaskForm = {
   dueDate: "",
 };
 
-const selectStatusFormItems: { value: TaskStatus; label: string }[] =
-  selectStatusItems.filter(
-    (item): item is { value: TaskStatus; label: string } =>
-      item.value !== "all",
-  );
-
 export default function Home() {
   const [taskList, setTaskList] = useState<Task[]>(tasks);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortOrder, setSortOrder] = useState<TaskSortOrder>("asc");
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -124,10 +96,6 @@ export default function Home() {
       [key]: value,
     }));
   };
-
-  const currentStatusFormLabel = selectStatusFormItems.find(
-    (item) => item.value === form.status,
-  )?.label;
 
   const handleOpenChange = (nextOpen: boolean) => {
     setDialogOpen(nextOpen);
@@ -233,99 +201,25 @@ export default function Home() {
           </div>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
-          <DialogTrigger
-            type="button"
-            className="flex items-center gap-2 border p-1.5 rounded-lg h-8 text-base text-center w-full justify-center text-nowrap hover:bg-muted md:w-35"
-          >
-            <CirclePlus className="size-4" />
-            New Task
-          </DialogTrigger>
-          <DialogContent>
-            <form onSubmit={handleSubmit}>
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-                <DialogDescription>새 Task를 작성해보세요.</DialogDescription>
-              </DialogHeader>
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="title">Task 제목</FieldLabel>
-                  <Input
-                    id="title"
-                    name="title"
-                    placeholder="Task 제목"
-                    value={form.title}
-                    onChange={(e) => updateForm("title", e.target.value)}
-                    maxLength={50}
-                  />
-                  <FieldDescription className="text-right">
-                    {form.title.length} / 50
-                  </FieldDescription>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="description">설명</FieldLabel>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Task 설명란"
-                    value={form.description}
-                    onChange={(e) => updateForm("description", e.target.value)}
-                    maxLength={300}
-                  />
-                  <FieldDescription className="text-right">
-                    {form.description.length} / 300
-                  </FieldDescription>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="status">현재 상태</FieldLabel>
-                  <Select
-                    id="status"
-                    name="status"
-                    value={form.status}
-                    onValueChange={(value) => {
-                      if (value) {
-                        updateForm("status", value);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue>{currentStatusFormLabel}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent alignItemWithTrigger={false}>
-                      {selectStatusItems
-                        .filter((item) => item.value !== "all")
-                        .map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="dueDate">마감 기한(D-day)</FieldLabel>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={3650}
-                    id="dueDate"
-                    name="dueDate"
-                    value={form.dueDate}
-                    onChange={(e) => updateForm("dueDate", e.target.value)}
-                  />
-                </Field>
-              </FieldGroup>
-              <DialogFooter>
-                <Button type="submit" variant="outline">
-                  Add Task
-                </Button>
-                <DialogClose className="inline-flex items-center justify-center rounded-md bg-destructive/70 px-4 py-1 text-sm font-medium text-destructive-foreground hover:bg-destructive/80 transition-colors cursor-pointer">
-                  Cancel
-                </DialogClose>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <TaskFormDialog
+          open={dialogOpen}
+          onOpenChange={handleOpenChange}
+          form={form}
+          onSubmit={handleSubmit}
+          updateForm={updateForm}
+          title="Task 생성"
+          description="새 Task를 작성해보세요."
+          submitLabel="Task 생성"
+          trigger={
+            <DialogTrigger
+              type="button"
+              className="flex items-center gap-2 border p-1.5 rounded-lg h-8 text-base text-center w-full justify-center text-nowrap hover:bg-muted md:w-35"
+            >
+              <CirclePlus className="size-4" />
+              New Task
+            </DialogTrigger>
+          }
+        />
       </div>
       <TaskList
         tasks={sortedTasks}
