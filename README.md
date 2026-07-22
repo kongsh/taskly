@@ -9,11 +9,25 @@
 - Framework : Next.js (App Router)
 - Language : Typescript
 - Style : Tailwind CSS, shadcn/ui
-- State : Tanstack Query, Zustand
-- Backend : Supabase
-- Testing : Vitest, React Testing Library
+- State : Tanstack Query(예정), Zustand(예정)
+- Backend : Supabase(예정)
+- Testing : Vitest(예정), React Testing Library(예정)
 - Quality : ESLint, Prettier
-- Deploy : Vercel
+- Deploy : Vercel(예정)
+
+## 현재 구현된 기능
+
+- Task 생성
+- Task 수정
+- Task 삭제
+- Task 상태 변경 (준비 중 → 진행 중 → 완료)
+- 검색
+- 상태 필터
+- 정렬
+- LocalStorage를 이용한 데이터 유지
+- 반응형 UI (Desktop / Mobile)
+- Toast 알림
+- 입력값 Validation
 
 ## 폴더 구조
 
@@ -33,7 +47,6 @@ src
 │       ├── components
 │       ├── hooks
 │       ├── services
-│       ├── types
 │       └── utils
 │
 ├── hooks
