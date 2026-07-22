@@ -52,7 +52,7 @@ export function TaskFormDialog({
   title,
   description,
   submitLabel,
-  trigger: children,
+  trigger,
 }: TaskFormDialogProps) {
   const currentStatusLabel = selectStatusItems.find(
     (item) => item.value === form.status,
@@ -60,7 +60,7 @@ export function TaskFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {children}
+      {trigger}
       <DialogContent>
         <form onSubmit={onSubmit}>
           <DialogHeader>
