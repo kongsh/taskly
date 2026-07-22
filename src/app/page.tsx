@@ -39,6 +39,7 @@ import { CirclePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { loadTasks, saveTasks } from "@/features/task/services/taskStorage";
+import { validateTaskForm } from "@/features/task/utils/validateTaskForm";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -139,27 +140,12 @@ export default function Home() {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!form.title.trim()) {
-      toast.error("제목을 입력해주세요.");
-      return;
-    }
-    if (!form.description.trim()) {
-      toast.error("설명을 입력해주세요.");
-      return;
-    }
-    if (form.dueDate === "") {
-      toast.error("D-day를 입력해주세요.");
-      return;
-    }
-    if (Number(form.dueDate) < 1) {
-      toast.error("D-day는 1 이상의 값을 입력해주세요.");
-      return;
-    }
-    if (Number(form.dueDate) > 3650) {
-      toast.error("D-day는 3650 이하의 값을 입력해주세요.");
-      return;
-    }
+    const result = validateTaskForm(form);
 
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     setTaskList((prev) => [
       ...prev,
       {

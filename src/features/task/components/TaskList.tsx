@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
+import { validateTaskForm } from "../utils/validateTaskForm";
 
 type TaskListProps = {
   tasks: Task[];
@@ -77,27 +78,12 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
   const handleUpdateSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!form.title.trim()) {
-      toast.error("제목을 입력해주세요.");
-      return;
-    }
-    if (!form.description.trim()) {
-      toast.error("설명을 입력해주세요.");
-      return;
-    }
-    if (form.dueDate === "") {
-      toast.error("D-day를 입력해주세요.");
-      return;
-    }
-    if (Number(form.dueDate) < 1) {
-      toast.error("D-day는 1 이상의 값을 입력해주세요.");
-      return;
-    }
-    if (Number(form.dueDate) > 3650) {
-      toast.error("D-day는 3650 이하의 값을 입력해주세요.");
-      return;
-    }
+    const result = validateTaskForm(form);
 
+    if (!result.valid) {
+      toast.error(result.message);
+      return;
+    }
     updateTask({ ...form, dueDate: Number(form.dueDate) });
 
     setUpdateDialogOpen(false);
