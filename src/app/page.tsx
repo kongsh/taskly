@@ -1,6 +1,6 @@
 "use client";
 
-import { TaskList } from "@/components/task/TaskList";
+import { TaskList } from "@/features/task/TaskList";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -61,7 +61,8 @@ const INITIAL_FORM: TaskForm = {
 
 const selectStatusFormItems: { value: TaskStatus; label: string }[] =
   selectStatusItems.filter(
-    (item): item is { value: TaskStatus; label: string } => item.value !== "all"
+    (item): item is { value: TaskStatus; label: string } =>
+      item.value !== "all",
   );
 
 export default function Home() {

@@ -1,5 +1,10 @@
-import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
 import { Circle, EllipsisVertical } from "lucide-react";
 import { Task, TaskForm } from "@/types/task";
 import {
@@ -7,7 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../../components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 type TaskCardProps = {
