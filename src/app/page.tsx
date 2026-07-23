@@ -13,11 +13,12 @@ import { tasks } from "@/data/tasks";
 import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { loadTasks, saveTasks } from "@/features/task/services/taskStorage";
+import { saveTasks } from "@/features/task/services/taskStorage";
 import { validateTaskForm } from "@/features/task/utils/validateTaskForm";
 import { TaskFormDialog } from "@/features/task/components/TaskFormDialog";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { CirclePlus } from "lucide-react";
+import { useTasks } from "@/features/task/hooks/useTasks";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -47,10 +48,14 @@ export default function Home() {
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
+  const { data } = useTasks();
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTaskList(loadTasks(tasks));
-  }, []);
+    if (data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTaskList(data);
+    }
+  }, [data]);
 
   useEffect(() => {
     saveTasks(taskList);

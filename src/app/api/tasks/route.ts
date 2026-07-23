@@ -1,5 +1,11 @@
-import { tasks } from "@/data/tasks";
+import { supabase } from "@/lib/supabase/supabase";
 
 export async function GET() {
-  return Response.json(tasks);
+  const { data, error } = await supabase.from("Task").select();
+
+  if (error) {
+    return Response.json({ message: error.message }, { status: 500 });
+  }
+
+  return Response.json(data);
 }
