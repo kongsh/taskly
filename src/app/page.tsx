@@ -19,6 +19,7 @@ import { TaskFormDialog } from "@/features/task/components/TaskFormDialog";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { CirclePlus } from "lucide-react";
 import { useTasks } from "@/features/task/hooks/useTasks";
+import { useCreateTask } from "@/features/task/hooks/useCreateTask";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -49,6 +50,7 @@ export default function Home() {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const { data } = useTasks();
+  const createTaskMutation = useCreateTask();
 
   useEffect(() => {
     if (data) {
@@ -119,19 +121,17 @@ export default function Home() {
       toast.error(result.message);
       return;
     }
-    setTaskList((prev) => [
-      ...prev,
-      {
-        ...form,
-        id: crypto.randomUUID(),
-        dueDate: Number(form.dueDate),
+    createTaskMutation.mutate(form, {
+      onSuccess: () => {
+        setDialogOpen(false);
+        setForm(INITIAL_FORM);
+
+        toast.success("Task가 추가되었습니다.");
       },
-    ]);
-
-    setDialogOpen(false);
-    setForm(INITIAL_FORM);
-
-    toast.success("Task가 추가되었습니다.");
+      onError: () => {
+        toast.error("Task 생성에 실패하였습니다.");
+      },
+    });
   };
 
   const updateTask = (updatedTask: Task) => {

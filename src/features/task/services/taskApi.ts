@@ -1,5 +1,5 @@
 import { Tables } from "@/types/database.types";
-import { Task } from "@/types/task";
+import { Task, TaskForm } from "@/types/task";
 
 export async function getTasks(): Promise<Task[]> {
   const response = await fetch("/api/tasks");
@@ -35,3 +35,17 @@ const toTask = ({
     dueDate,
   };
 };
+
+export async function createTask(task: TaskForm) {
+  const response = await fetch("/api/tasks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(task),
+  });
+
+  if (!response.ok) {
+    throw new Error("Task 생성에 실패하였습니다.");
+  }
+
+  return response.json();
+}
