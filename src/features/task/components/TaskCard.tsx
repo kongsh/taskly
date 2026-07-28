@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 type TaskCardProps = {
   task: Task;
-  handleUpdateClick: (nextOpen: boolean, task: TaskForm) => void;
+  handleUpdateClick: (nextOpen: boolean, task: Task) => void;
   handleDeleteClick: (nextOpen: boolean, id: string, title: string) => void;
   handleStatusClick: (updatedTask: Task) => void;
 };
@@ -41,7 +41,6 @@ export default function TaskCard({
   const handleUpdate = () => {
     handleUpdateClick(true, {
       ...task,
-      dueDate: String(dueDate),
     });
   };
 

@@ -9,11 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { tasks } from "@/data/tasks";
-import { StatusFilter, Task, TaskForm, TaskSortOrder } from "@/types/task";
-import { useEffect, useState } from "react";
+import { StatusFilter, TaskForm, TaskSortOrder } from "@/types/task";
+import { useState } from "react";
 import { toast } from "sonner";
-import { saveTasks } from "@/features/task/services/taskStorage";
 import { validateTaskForm } from "@/features/task/utils/validateTaskForm";
 import { TaskFormDialog } from "@/features/task/components/TaskFormDialog";
 import { DialogTrigger } from "@/components/ui/dialog";
@@ -34,7 +32,6 @@ const selectSortItems: { value: TaskSortOrder; label: string }[] = [
 ];
 
 const INITIAL_FORM: TaskForm = {
-  id: "",
   title: "",
   description: "",
   status: "todo",
@@ -42,34 +39,22 @@ const INITIAL_FORM: TaskForm = {
 };
 
 export default function Home() {
-  const [taskList, setTaskList] = useState<Task[]>(tasks);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortOrder, setSortOrder] = useState<TaskSortOrder>("asc");
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
-  const { data } = useTasks();
+  const { data: tasks = [] } = useTasks();
   const createTaskMutation = useCreateTask();
 
-  useEffect(() => {
-    if (data) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTaskList(data);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    saveTasks(taskList);
-  }, [taskList]);
-
-  const keyword = searchQuery.toLowerCase();
+  const keyword = searchQuery.trim().toLowerCase();
 
   const currentStatusLabel =
     selectStatusItems.find((item) => item.value === statusFilter)?.label ??
     "전체";
 
-  const filteredTasks = taskList.filter((task) => {
+  const filteredTasks = tasks.filter((task) => {
     const matchesStatus =
       statusFilter === "all" || task.status === statusFilter;
 
@@ -80,15 +65,15 @@ export default function Home() {
     return matchesStatus && matchesSearchQuery;
   });
 
-  const currentSortLabel = selectSortItems.find(
-    (item) => item.value === sortOrder,
-  )?.label;
+  const currentSortLabel =
+    selectSortItems.find((item) => item.value === sortOrder)?.label ??
+    "오래된 순";
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     return sortOrder === "asc" ? a.dueDate - b.dueDate : b.dueDate - a.dueDate;
   });
 
-  const stats = taskList.reduce(
+  const stats = tasks.reduce(
     (acc, task) => {
       if (task.status === "progress") acc.inProgress++;
       if (task.status === "done") acc.completed++;
@@ -134,21 +119,11 @@ export default function Home() {
     });
   };
 
-  const updateTask = (updatedTask: Task) => {
-    setTaskList((prev) =>
-      prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
-    );
-  };
-
-  const deleteTask = (deleteTaskId: string) => {
-    setTaskList((prev) => prev.filter((task) => task.id !== deleteTaskId));
-  };
-
   return (
     <div className="min-w-96 flex size-full flex-col p-8 gap-6">
       <h2 className="text-3xl font-bold">My Tasks</h2>
       <div className="text-lg text-muted-foreground text-nowrap">
-        <span>{taskList.length} tasks</span> |{" "}
+        <span>{tasks.length} tasks</span> |{" "}
         <span>{stats.inProgress} In progress</span> |{" "}
         <span>{stats.completed} Completed</span>
       </div>
@@ -226,11 +201,7 @@ export default function Home() {
           }
         />
       </div>
-      <TaskList
-        tasks={sortedTasks}
-        updateTask={updateTask}
-        deleteTask={deleteTask}
-      />
+      <TaskList tasks={sortedTasks} />
     </div>
   );
 }

@@ -13,7 +13,6 @@ export interface Task {
 }
 
 export interface TaskForm {
-  id: string;
   title: string;
   description: string;
   status: TaskStatus;

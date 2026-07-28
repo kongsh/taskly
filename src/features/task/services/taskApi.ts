@@ -49,3 +49,28 @@ export async function createTask(task: TaskForm) {
 
   return response.json();
 }
+
+export async function updateTask(id: string, task: TaskForm) {
+  const response = await fetch(`/api/tasks/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(task),
+  });
+
+  if (!response.ok) {
+    throw new Error("Task 수정에 실패하였습니다.");
+  }
+
+  return response.json();
+}
+export async function deleteTask(id: string) {
+  const response = await fetch(`/api/tasks/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Task 삭제에 실패하였습니다.");
+  }
+
+  return response.json();
+}

@@ -14,24 +14,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { validateTaskForm } from "../utils/validateTaskForm";
+import { validateTaskForm } from "@/features/task/utils/validateTaskForm";
 import { TaskFormDialog } from "./TaskFormDialog";
+import { useUpdateTask } from "@/features/task/hooks/useUpdateTask";
+import { useDeleteTask } from "@/features/task/hooks/useDeleteTask";
 
 type TaskListProps = {
   tasks: Task[];
-  updateTask: (updatedTask: Task) => void;
-  deleteTask: (deleteTaskId: string) => void;
 };
 
 const INITIAL_FORM: TaskForm = {
-  id: "",
   title: "",
   description: "",
   status: "todo",
   dueDate: "",
 };
 
-export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
+export function TaskList({ tasks }: TaskListProps) {
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -40,8 +40,19 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
     title: "",
   });
 
-  const handleUpdateClick = (nextOpen: boolean, task: TaskForm) => {
-    setForm({ ...task });
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
+
+  const handleUpdateClick = (nextOpen: boolean, task: Task) => {
+    setEditingTask(task);
+
+    setForm({
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      dueDate: String(task.dueDate),
+    });
+
     setUpdateDialogOpen(nextOpen);
   };
 
@@ -54,11 +65,22 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
       toast.error(result.message);
       return;
     }
-    updateTask({ ...form, dueDate: Number(form.dueDate) });
 
-    setUpdateDialogOpen(false);
+    if (!editingTask) return;
 
-    toast.success("Task가 수정되었습니다.");
+    updateTaskMutation.mutate(
+      { id: editingTask.id, task: form },
+      {
+        onSuccess: () => {
+          setUpdateDialogOpen(false);
+
+          toast.success("Task가 수정되었습니다.");
+        },
+        onError: () => {
+          toast.error("Task 수정에 실패하였습니다.");
+        },
+      },
+    );
   };
 
   const updateForm = <K extends keyof TaskForm>(key: K, value: TaskForm[K]) => {
@@ -74,18 +96,60 @@ export function TaskList({ tasks, updateTask, deleteTask }: TaskListProps) {
   };
 
   const handleDelete = () => {
-    deleteTask(deleteInfo.id);
-    setDeleteDialogOpen(false);
-    toast.success("Task가 삭제되었습니다.");
+    deleteTaskMutation.mutate(
+      { id: deleteInfo.id },
+      {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          toast.success("Task가 삭제되었습니다.");
+        },
+        onError: () => {
+          toast.error("Task 삭제에 실패하였습니다.");
+        },
+      },
+    );
   };
 
   const handleStatusClick = (clickedTask: Task) => {
-    switch (clickedTask.status) {
+    const { id, description, dueDate, status, title } = clickedTask;
+
+    switch (status) {
       case "todo":
-        updateTask({ ...clickedTask, status: "progress" });
+        updateTaskMutation.mutate(
+          {
+            id: id,
+            task: {
+              title,
+              description,
+              status: "progress",
+              dueDate: String(dueDate),
+            },
+          },
+          {
+            onError: () => {
+              toast.error("Task 수정에 실패하였습니다.");
+            },
+          },
+        );
+
         break;
       case "progress":
-        updateTask({ ...clickedTask, status: "done" });
+        updateTaskMutation.mutate(
+          {
+            id: id,
+            task: {
+              title,
+              description,
+              status: "done",
+              dueDate: String(dueDate),
+            },
+          },
+          {
+            onError: () => {
+              toast.error("Task 수정에 실패하였습니다.");
+            },
+          },
+        );
         break;
       case "done":
         break;
