@@ -18,6 +18,8 @@ import { DialogTrigger } from "@/components/ui/dialog";
 import { CirclePlus } from "lucide-react";
 import { useTasks } from "@/features/task/hooks/useTasks";
 import { useCreateTask } from "@/features/task/hooks/useCreateTask";
+import { TaskListSkeleton } from "@/features/task/components/TaskListSkeleton";
+import TaskError from "@/features/task/components/TaskError";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -45,7 +47,7 @@ export default function Home() {
   const [form, setForm] = useState<TaskForm>(INITIAL_FORM);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
-  const { data: tasks = [] } = useTasks();
+  const { data: tasks = [], isLoading, isError, error, refetch } = useTasks();
   const createTaskMutation = useCreateTask();
 
   const keyword = searchQuery.trim().toLowerCase();
@@ -118,6 +120,14 @@ export default function Home() {
       },
     });
   };
+
+  if (isLoading) {
+    return <TaskListSkeleton />;
+  }
+
+  if (isError) {
+    return <TaskError message={(error as Error).message} onRetry={refetch} />;
+  }
 
   return (
     <div className="min-w-96 flex size-full flex-col p-8 gap-6">
