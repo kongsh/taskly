@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -7,9 +6,12 @@ export default function NotFound() {
       <h1 className="text-4xl font-bold">404</h1>
       <p>페이지를 찾을 수 없습니다.</p>
 
-      <Button>
-        <Link href="/">홈으로 이동</Link>
-      </Button>
+      <Link
+        href="/"
+        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+      >
+        홈으로 이동
+      </Link>
     </div>
   );
 }
