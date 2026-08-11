@@ -20,6 +20,9 @@ import { useTasks } from "@/features/task/hooks/useTasks";
 import { useCreateTask } from "@/features/task/hooks/useCreateTask";
 import { TaskListSkeleton } from "@/features/task/components/TaskListSkeleton";
 import TaskError from "@/features/task/components/TaskError";
+import { filterTasks } from "@/features/task/utils/filterTasks";
+import { sortTasks } from "@/features/task/utils/sortTasks";
+import { getTaskStats } from "@/features/task/utils/getTaskStats";
 
 const selectStatusItems: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -50,39 +53,17 @@ export default function Home() {
   const { data: tasks = [], isLoading, isError, error, refetch } = useTasks();
   const createTaskMutation = useCreateTask();
 
-  const keyword = searchQuery.trim().toLowerCase();
-
   const currentStatusLabel =
     selectStatusItems.find((item) => item.value === statusFilter)?.label ??
     "전체";
-
-  const filteredTasks = tasks.filter((task) => {
-    const matchesStatus =
-      statusFilter === "all" || task.status === statusFilter;
-
-    const matchesSearchQuery =
-      task.title.toLowerCase().includes(keyword) ||
-      task.description.toLowerCase().includes(keyword);
-
-    return matchesStatus && matchesSearchQuery;
-  });
 
   const currentSortLabel =
     selectSortItems.find((item) => item.value === sortOrder)?.label ??
     "오래된 순";
 
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    return sortOrder === "asc" ? a.dueDate - b.dueDate : b.dueDate - a.dueDate;
-  });
-
-  const stats = tasks.reduce(
-    (acc, task) => {
-      if (task.status === "progress") acc.inProgress++;
-      if (task.status === "done") acc.completed++;
-      return acc;
-    },
-    { inProgress: 0, completed: 0 },
-  );
+  const filteredTasks = filterTasks(tasks, searchQuery, statusFilter);
+  const sortedTasks = sortTasks(filteredTasks, sortOrder);
+  const stats = getTaskStats(tasks);
 
   const updateForm = <K extends keyof TaskForm>(key: K, value: TaskForm[K]) => {
     setForm((prev) => ({
