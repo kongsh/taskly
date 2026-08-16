@@ -20,6 +20,7 @@ type TaskCardProps = {
   handleUpdateClick: (nextOpen: boolean, task: Task) => void;
   handleDeleteClick: (nextOpen: boolean, id: string, title: string) => void;
   handleStatusClick: (updatedTask: Task) => void;
+  isStatusPending: boolean;
 };
 
 const STATUS: Record<Task["status"], { label: string; color: string }> = {
@@ -33,6 +34,7 @@ export default function TaskCard({
   handleUpdateClick,
   handleDeleteClick,
   handleStatusClick,
+  isStatusPending,
 }: TaskCardProps) {
   const { id, title, description, status, dueDate } = task;
 
@@ -59,8 +61,9 @@ export default function TaskCard({
         <div className="flex flex-col gap-3 flex-1 md:flex-row md:items-center">
           <Button
             variant={status === "done" ? "outline" : "secondary"}
-            className="justify-between cursor-pointer w-20 gap-2"
+            className="justify-between cursor-pointer w-20 gap-2 disabled:cursor-not-allowed"
             onClick={() => handleStatusClick(task)}
+            disabled={isStatusPending || status === "done"}
           >
             {
               <>

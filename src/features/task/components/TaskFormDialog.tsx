@@ -35,6 +35,7 @@ type TaskFormDialogProps = {
   description: string;
   submitLabel: string;
   trigger?: React.ReactNode;
+  isPending?: boolean;
 };
 
 const selectStatusItems: { value: TaskStatus; label: string }[] = [
@@ -53,6 +54,7 @@ export function TaskFormDialog({
   description,
   submitLabel,
   trigger,
+  isPending,
 }: TaskFormDialogProps) {
   const currentStatusLabel = selectStatusItems.find(
     (item) => item.value === form.status,
@@ -134,8 +136,8 @@ export function TaskFormDialog({
             </Field>
           </FieldGroup>
           <DialogFooter>
-            <Button type="submit" variant="outline">
-              {submitLabel}
+            <Button type="submit" variant="outline" disabled={isPending}>
+              {isPending ? "처리 중..." : submitLabel}
             </Button>
             <DialogClose className="inline-flex items-center justify-center rounded-md bg-destructive/70 px-4 py-1 text-sm font-medium text-destructive-foreground hover:bg-destructive/80 transition-colors cursor-pointer">
               Cancel

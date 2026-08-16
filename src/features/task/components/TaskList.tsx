@@ -166,6 +166,10 @@ export function TaskList({ tasks }: TaskListProps) {
               handleUpdateClick={handleUpdateClick}
               handleDeleteClick={handleDeleteClick}
               handleStatusClick={handleStatusClick}
+              isStatusPending={
+                updateTaskMutation.isPending &&
+                updateTaskMutation.variables?.id === task.id
+              }
             />
           </li>
         ))}
@@ -179,6 +183,7 @@ export function TaskList({ tasks }: TaskListProps) {
         title="Task 수정"
         description="Task를 수정해보세요."
         submitLabel="Task 수정"
+        isPending={updateTaskMutation.isPending}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -193,8 +198,12 @@ export function TaskList({ tasks }: TaskListProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleDelete}>
-              Delete Task
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteTaskMutation.isPending}
+            >
+              {deleteTaskMutation.isPending ? "처리 중..." : "Delete Task"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
